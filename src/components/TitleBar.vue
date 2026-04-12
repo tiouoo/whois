@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <span class="title">tiouo</span>
+    <span class="title">whois.tio.ooo</span>
     <div class="nav-container">
       <a-menu
         v-model:selectedKeys="current"

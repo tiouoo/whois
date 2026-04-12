@@ -3,21 +3,14 @@
     <h1 class="title">Whois 查询</h1>
 
     <div class="search-box">
-      <div class="search-input-wrapper">
-        <a-input
-          v-model:value="domain"
-          placeholder="输入域名..."
-          size="large"
-          @pressEnter="handleWhoisQuery">
-          <template #prefix>
-            <GlobalOutlined class="icon" />
-          </template>
-        </a-input>
-        <button class="x-s-btn search-btn" @click="handleWhoisQuery" :disabled="loading">
-          <SearchOutlined />
-          <span>查询</span>
-        </button>
-      </div>
+      <a-input v-model:value="domain" placeholder="输入域名..." size="large" @pressEnter="handleWhoisQuery">
+        <template #prefix>
+          <GlobalOutlined class="icon" />
+        </template>
+        <template #suffix>
+          <SearchOutlined class="icon" @click="handleWhoisQuery" />
+        </template>
+      </a-input>
     </div>
 
     <div v-if="loading" class="loading-state">
@@ -25,16 +18,12 @@
     </div>
 
     <div v-else-if="error" class="error-state">
-      <a-alert
-        message="查询失败"
-        description="请检查域名格式是否正确，或稍后重试"
-        type="error"
-        show-icon
-      />
+      <a-alert message="查询失败" description="请检查域名格式是否正确，或稍后重试" type="error" show-icon />
     </div>
 
     <div v-else-if="result" class="result-container">
-      <div class="result-card">
+
+      <div class="card" style="padding-bottom: 25px;">
         <div class="result-header">
           <h2 class="result-title">{{ result.data.domain }}</h2>
           <span class="availability-badge" :class="result.data.is_available ? 'available' : 'registered'">
@@ -42,83 +31,124 @@
           </span>
         </div>
 
-        <div class="result-info">
-          <div class="info-row">
-            <span class="info-label">注册商：</span>
-            <span class="info-value">{{ result.data.info.registrar_name }}</span>
+        <div class="info-card domain-info">
+          <div class="info-card-header">
+            <GlobalOutlined class="card-icon" />
+            <h3>域名信息</h3>
           </div>
-          <div class="info-row">
-            <span class="info-label">创建时间：</span>
-            <span class="info-value">{{ result.data.info.creation_time }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">到期时间：</span>
-            <span class="info-value">{{ result.data.info.expiration_time }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">已注册天数：</span>
-            <span class="info-value">{{ result.data.info.creation_days }} 天</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">剩余天数：</span>
-            <span class="info-value">{{ result.data.info.valid_days }} 天</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">域名状态：</span>
-            <div class="status-list">
-              <span v-for="(status, index) in result.data.info.domain_status" :key="index" class="status-item">
-                {{ status }}
-              </span>
+          <div class="info-card-content">
+            <div class="info-item">
+              <span class="info-label">注册商：</span>
+              <span class="info-value">{{ result.data.info.registrar_name }}</span>
             </div>
-          </div>
-          <div class="info-row">
-            <span class="info-label">DNS 服务器：</span>
-            <div class="ns-list">
-              <span v-for="(ns, index) in result.data.info.name_server" :key="index" class="ns-item">
-                {{ ns }}
-              </span>
+            <div class="info-item">
+              <span class="info-label">注册日期：</span>
+              <span class="info-value">{{ result.data.info.creation_time }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">到期日期：</span>
+              <span class="info-value expiration">{{ result.data.info.expiration_time }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">注册天数：</span>
+              <span class="info-value">{{ result.data.info.creation_days }} 天</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">距离到期：</span>
+              <span class="info-value">{{ result.data.info.valid_days }} 天</span>
             </div>
           </div>
         </div>
 
-        <div class="result-footer">
-          <span class="query-time">查询时间：{{ result.data.query_time }}</span>
+        <div class="info-card registrant-info">
+          <div class="info-card-header">
+            <UserOutlined class="card-icon" />
+            <h3>注册人信息</h3>
+          </div>
+          <div class="info-card-content">
+            <div class="info-item">
+              <span class="info-label">注册人：</span>
+              <span class="info-value">{{ result.data.info.registrant_name || '已开启隐私保护' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">注册邮箱：</span>
+              <span class="info-value">{{ result.data.info.registrant_email || '已开启隐私保护' }}</span>
+            </div>
+          </div>
+        </div>
+        <div v-if="result.data.info.domain_status.length > 0" class="info-card domain-status">
+          <div class="info-card-header">
+            <AlertOutlined class="card-icon" />
+            <h3>域名状态</h3>
+          </div>
+          <div class="info-card-content">
+            <div v-for="(status, index) in result.data.info.domain_status" :key="index" class="status-item">
+              <span class="status-text">{{ status }}</span>
+              <CopyOutlined @click="copy(status)" class="copy-icon" />
+            </div>
+          </div>
+        </div>
+        <div v-if="result.data.info.name_server.length > 0" class="info-card dns-servers">
+          <div class="info-card-header">
+            <WifiOutlined class="card-icon" />
+            <h3>DNS服务器</h3>
+          </div>
+          <div class="info-card-content">
+            <div v-for="(ns, index) in result.data.info.name_server" :key="index" class="ns-item">
+              <span class="ns-text">{{ ns }}</span>
+              <CopyOutlined @click="copy(ns)" class="copy-icon" />
+            </div>
+          </div>
+        </div>
+        <div v-if="result.data.info.whois_server.length > 0" class="info-card other-info">
+          <div class="info-card-header">
+            <InfoCircleOutlined class="card-icon" />
+            <h3>其它信息</h3>
+          </div>
+          <div class="info-card-content">
+            <div class="info-item">
+              <span class="info-label">Whois服务器：</span>
+              <span class="info-value">{{ result.data.info.whois_server }}</span>
+            </div>
+          </div>
         </div>
       </div>
+
+
+
 
       <div class="raw-data-card">
         <div class="raw-header">
           <h3>原始数据</h3>
-          <a-button type="link" @click="showRaw = !showRaw">
-            {{ showRaw ? '隐藏' : '显示' }}
-          </a-button>
         </div>
-        <div v-if="showRaw" class="raw-content">
+        <div class="raw-content">
           <pre>{{ result.data.raw }}</pre>
         </div>
       </div>
     </div>
 
     <div v-else class="empty-state">
-      <a-empty
-        description="输入域名并点击查询按钮开始Whois查询"
-      />
+      <a-empty description="输入域名并点击查询按钮开始Whois查询" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { SearchOutlined, GlobalOutlined } from '@ant-design/icons-vue';
+import { SearchOutlined, GlobalOutlined, UserOutlined, InfoCircleOutlined, AlertOutlined, WifiOutlined, CopyOutlined } from '@ant-design/icons-vue';
 import { ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { getWhoisInfo } from '../utils/whois';
 import type { WhoisResponse } from '../types/whois';
 
+const copy = (str: string) => {
+  navigator.clipboard.writeText(str);
+  message.success('复制成功');
+}
+
 const domain = ref('');
 const loading = ref(false);
 const error = ref(false);
 const result = ref<WhoisResponse | null>(null);
-const showRaw = ref(false);
 
 async function handleWhoisQuery() {
   const domainValue = domain.value.trim();
@@ -134,6 +164,7 @@ async function handleWhoisQuery() {
 
   try {
     const data = await getWhoisInfo(domainValue);
+    console.log('data:', data);
     result.value = data;
   } catch (err) {
     console.error('查询失败:', err);
@@ -167,59 +198,49 @@ async function handleWhoisQuery() {
   margin-right: auto;
 }
 
-.search-input-wrapper {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.search-input-wrapper :deep(.ant-input-affix-wrapper) {
-  flex: 1;
+.search-box :deep(.ant-input-affix-wrapper) {
   background-color: var(--card-bg);
   border: var(--card-border);
-  border-radius: var(--card-radius);
+  border-radius: 16px;
   color: var(--text-color);
   padding: 12px 16px;
 }
 
-.search-input-wrapper :deep(.ant-input-affix-wrapper:focus),
-.search-input-wrapper :deep(.ant-input-affix-wrapper-focused),
-.search-input-wrapper :deep(.ant-input-affix-wrapper:hover) {
+.search-box :deep(.ant-input-affix-wrapper:focus),
+.search-box :deep(.ant-input-affix-wrapper-focused),
+.search-box :deep(.ant-input-affix-wrapper:hover) {
   border-color: #667eea;
   box-shadow: none;
 }
 
-[data-theme='dark'] .search-input-wrapper :deep(.ant-input-affix-wrapper:focus),
-[data-theme='dark'] .search-input-wrapper :deep(.ant-input-affix-wrapper-focused),
-[data-theme='dark'] .search-input-wrapper :deep(.ant-input-affix-wrapper:hover) {
+[data-theme='dark'] .search-box :deep(.ant-input-affix-wrapper:focus),
+[data-theme='dark'] .search-box :deep(.ant-input-affix-wrapper-focused),
+[data-theme='dark'] .search-box :deep(.ant-input-affix-wrapper:hover) {
   border-color: #667eea;
   box-shadow: none;
 }
 
-.search-input-wrapper :deep(.ant-input) {
+.search-box :deep(.ant-input) {
   background-color: transparent !important;
   color: var(--text-color);
   font-family: 'ZhuZiAYuanJWD', sans-serif;
   font-size: 16px !important;
 }
 
-.search-input-wrapper :deep(.ant-input::placeholder) {
+.search-box :deep(.ant-input::placeholder) {
   color: var(--text-color-light);
   font-family: 'ZhuZiAYuanJWD', sans-serif;
   font-size: 16px;
 }
 
-.search-input-wrapper :deep(.anticon) {
+.search-box :deep(.anticon) {
   color: var(--text-color-light);
   margin-right: 6px;
 }
 
 .search-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 24px;
-  font-size: 16px;
+  margin: 0 4px;
+  border-radius: 8px;
 }
 
 .loading-state {
@@ -235,38 +256,29 @@ async function handleWhoisQuery() {
 .result-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.result-card {
-  background-color: var(--card-bg);
-  border: var(--card-border);
-  border-radius: var(--card-radius);
-  padding: 24px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  gap: 24px;
 }
 
 .result-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
   border-bottom: 1px solid var(--card-border);
 }
 
 .result-title {
   font-size: 24px;
-  font-weight: 600;
+  margin-left: 5px !important;
   color: var(--text-color);
   margin: 0;
 }
 
 .availability-badge {
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
+  margin-right: 2px;
 }
 
 .availability-badge.available {
@@ -279,20 +291,79 @@ async function handleWhoisQuery() {
   color: #9d174d;
 }
 
-.result-info {
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.info-card {
+  background-color: var(--card-bg);
+  border-radius: var(--card-radius);
+  padding: 5px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+h3 {
+  font-weight: 400 !important;
+  color: var(--text-color);
+}
+
+.info-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  margin-top: 14px;
+}
+
+.card-icon {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.domain-info .card-icon {
+  color: #3b82f6;
+}
+
+.registrant-info .card-icon {
+  color: #8b5cf6;
+}
+
+.other-info .card-icon {
+  color: #10b981;
+}
+
+.domain-status .card-icon {
+  color: #f59e0b;
+}
+
+.dns-servers .card-icon {
+  color: #6366f1;
+}
+
+.info-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.info-card-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-left: 12px;
 }
 
-.info-row {
+.info-item {
   display: flex;
-  align-items: flex-start;
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
 }
 
 .info-label {
-  min-width: 120px;
   font-weight: 500;
   color: var(--text-color-light);
   flex-shrink: 0;
@@ -301,32 +372,40 @@ async function handleWhoisQuery() {
 .info-value {
   color: var(--text-color);
   flex: 1;
+  text-align: right;
 }
 
-.status-list,
-.ns-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
+.info-value.expiration {
+  color: #ef4444;
+  font-weight: 500;
 }
 
 .status-item,
 .ns-item {
-  color: var(--text-color);
-  padding: 4px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
   background-color: var(--card-bg-hover);
-  border-radius: 6px;
+  border-radius: 8px;
+}
+
+.status-text,
+.ns-text {
+  color: var(--text-color);
+  flex: 1;
   font-size: 14px;
 }
 
-.result-footer {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--card-border);
-  text-align: right;
+.copy-icon {
   font-size: 14px;
   color: var(--text-color-light);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.copy-icon:hover {
+  color: #667eea;
 }
 
 .raw-data-card {
@@ -334,7 +413,6 @@ async function handleWhoisQuery() {
   border: var(--card-border);
   border-radius: var(--card-radius);
   padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .raw-header {
@@ -355,7 +433,7 @@ async function handleWhoisQuery() {
   background-color: var(--card-bg-hover);
   border-radius: 8px;
   padding: 16px;
-  max-height: 300px;
+  /* max-height: 300px; */
   overflow-y: auto;
 }
 
@@ -380,26 +458,31 @@ async function handleWhoisQuery() {
 }
 
 @media (max-width: 768px) {
-  .search-input-wrapper {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-item {
     flex-direction: column;
-  }
-
-  .search-input-wrapper :deep(.ant-input-affix-wrapper) {
-    width: 100%;
-  }
-
-  .search-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .info-row {
-    flex-direction: column;
+    align-items: flex-start;
     gap: 4px;
   }
 
-  .info-label {
-    min-width: auto;
+  .info-value {
+    text-align: left;
+    width: 100%;
+  }
+
+  .status-item,
+  .ns-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .copy-icon {
+    align-self: flex-end;
+    margin-top: -20px;
   }
 }
 </style>
