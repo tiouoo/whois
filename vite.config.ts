@@ -18,9 +18,9 @@ export default defineConfig({
       },
       includeAssets: ['favicon.ico', 'icon-192.png', 'icon-512.png', 'BingSiteAuth.xml'],
       manifest: {
-        name: 'tiouo',
-        short_name: 'tiouo',
-        description: 'tiouo',
+        name: 'tiouo.whois',
+        short_name: 'tiouo.whois',
+        description: 'tiouo.whois',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
