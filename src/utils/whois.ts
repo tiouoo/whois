@@ -9,5 +9,11 @@ export async function getWhoisInfo(domain: string): Promise<WhoisResponse> {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   });
+  
+  // 检查API响应的状态
+  if (response.data.status === 0) {
+    throw new Error(response.data.error || '查询失败');
+  }
+  
   return response.data;
 }

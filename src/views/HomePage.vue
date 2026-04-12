@@ -18,7 +18,7 @@
     </div>
 
     <div v-else-if="error" class="error-state">
-      <a-alert message="查询失败" description="请检查域名格式是否正确，或稍后重试" type="error" show-icon />
+      <a-alert message="查询失败" :description="errorMessage || '请检查域名格式是否正确，或稍后重试'" type="error" show-icon />
     </div>
 
     <div v-else-if="result" class="result-container">
@@ -159,6 +159,7 @@ const copy = (str: string) => {
 const domain = ref('');
 const loading = ref(false);
 const error = ref(false);
+const errorMessage = ref('');
 const result = ref<WhoisResponse | null>(null);
 
 async function handleWhoisQuery() {
@@ -171,6 +172,7 @@ async function handleWhoisQuery() {
 
   loading.value = true;
   error.value = false;
+  errorMessage.value = '';
   result.value = null;
 
   try {
@@ -180,7 +182,8 @@ async function handleWhoisQuery() {
   } catch (err) {
     console.error('查询失败:', err);
     error.value = true;
-    message.error('查询失败，请稍后重试');
+    errorMessage.value = err instanceof Error ? err.message : '查询失败，请稍后重试';
+    message.error(errorMessage.value);
   } finally {
     loading.value = false;
   }
