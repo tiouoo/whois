@@ -114,8 +114,19 @@
         </div>
       </div>
 
-
-
+      <div class="raw-data-card">
+        <div class="raw-header">
+          <h3>全部字段信息</h3>
+        </div>
+        <div class="fields-table">
+          <div class="fields-table-body">
+            <div v-for="(value, key) in result.data.fields" :key="key" class="fields-table-row">
+              <div class="fields-table-cell">{{ key }}</div>
+              <div class="fields-table-cell">{{ typeof value === 'object' ? JSON.stringify(value) : value || '<data notdisclosed>' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="raw-data-card">
         <div class="raw-header">
@@ -342,6 +353,10 @@ h3 {
   color: #6366f1;
 }
 
+.all-fields-info .card-icon {
+  color: #6366f1;
+}
+
 .info-card-header h3 {
   margin: 0;
   font-size: 16px;
@@ -349,11 +364,107 @@ h3 {
   color: var(--text-color);
 }
 
+.fields-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fields-table-header {
+  display: flex;
+  color: var(--text-color-light);
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.fields-table-header-cell {
+  flex: 1;
+  padding: 8px 12px;
+}
+
+
+.fields-table-row {
+  display: flex;
+  transition: background-color 0.2s ease;
+  padding: 4px 0;
+}
+
+.fields-table-row:not(:nth-last-child(1)){
+    border-bottom: var(--card-border) !important;
+
+}
+
+.fields-table-row:hover {
+  background-color: var(--card-bg-hover);
+}
+
+.fields-table-cell {
+  flex: 1;
+  padding: 10px 12px;
+  color: var(--text-color);
+}
+
+.fields-table-cell:first-child {
+  font-weight: 500;
+  color: var(--text-color-light);
+}
+
 .info-card-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-left: 12px;
+}
+
+.all-fields-info .info-card-content {
+  margin-left: 0;
+  padding: 0 12px;
+}
+
+.fields-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fields-table-header {
+  display: flex;
+  font-weight: 600;
+  color: var(--text-color-light);
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.fields-table-header-cell {
+  flex: 1;
+  padding: 8px 12px;
+}
+
+.fields-table-body {
+  overflow-y: auto;
+}
+
+.fields-table-row {
+  display: flex;
+  border-bottom: 1px solid var(--card-border);
+  transition: background-color 0.2s ease;
+}
+
+.fields-table-row:hover {
+  background-color: var(--card-bg-hover);
+}
+
+.fields-table-cell {
+  flex: 1;
+  padding: 10px 12px;
+  color: var(--text-color);
+  word-break: break-all;
+}
+
+.fields-table-cell:first-child {
+  font-weight: 500;
+  color: var(--text-color-light);
+  flex: 0 0 300px;
 }
 
 .info-item {
