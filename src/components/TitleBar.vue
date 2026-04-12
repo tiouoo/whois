@@ -30,6 +30,10 @@ const handleMenuClick: MenuProps['onClick'] = (info) => {
     toggleTheme();
     return;
   }
+  if (info.key == 'github') {
+    window.open('https://github.com/tiouoo')
+    return;
+  }
   if (info.key) {
     router.push(`/${info.key}`);
   }
