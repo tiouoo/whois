@@ -20,7 +20,7 @@ export default defineConfig({
       manifest: {
         name: 'tiouo.whois',
         short_name: 'tiouo.whois',
-        description: 'tiouo.whois',
+        description: '快速查询域名注册信息、到期时间、注册商等详细信息',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',

@@ -1,0 +1,6 @@
+# robots.txt for tiouo.whois
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://whois.tiouo.com/sitemap.xml
